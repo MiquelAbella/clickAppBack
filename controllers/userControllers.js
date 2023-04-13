@@ -47,7 +47,37 @@ const createUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-  console.log(req.body);
+  const { email, password } = req.body.user;
+
+  try {
+    const user = await User.findOne({ email: email });
+
+    if (!user) {
+      res.status(503).json({
+        ok: false,
+        msg: "User and password do not match",
+      });
+    }
+
+    const match = await bcrypt.compare(password, user.password);
+
+    if (!match) {
+      res.status(503).json({
+        ok: false,
+        msg: "User and password do not match",
+      });
+    }
+
+    res.status(200).json({
+      ok: true,
+      user,
+    });
+  } catch (error) {
+    res.status(503).json({
+      ok: false,
+      msg: "Something happened",
+    });
+  }
 };
 
 module.exports = { createUser, loginUser };

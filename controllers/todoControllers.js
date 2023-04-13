@@ -27,22 +27,15 @@ const createTodo = async (req, res) => {
       });
     }
 
-    if (user.todos) {
-      user.todos = [...user.todos, newTodo._id];
-    } else {
-      user.todos = [newTodo._id];
-    }
+    user.todos = [...user.todos, newTodo];
 
     await user.save();
-    await newTodo.save();
 
     return res.status(201).json({
       ok: true,
       user,
-      newTodo,
     });
   } catch (error) {
-    console.log(error);
     return res.status(503).json({
       ok: false,
       msg: "Something happened",
@@ -50,4 +43,44 @@ const createTodo = async (req, res) => {
   }
 };
 
-module.exports = { createTodo };
+const deleteTodo = async (req, res) => {
+  const { todoId, userId } = req.body;
+
+  if (!todoId || !userId) {
+    return res.status(503).json({
+      ok: false,
+      msg: "Something happened",
+    });
+  }
+
+  try {
+    const user = await User.findOne({ _id: userId });
+
+    if (!user) {
+      return res.status(503).json({
+        ok: false,
+        msg: "Something happened",
+      });
+    }
+
+    const filteredTodos = user.todos.filter((todo) => {
+      return todo._id.toString() !== todoId;
+    });
+
+    user.todos = filteredTodos;
+
+    await user.save();
+
+    res.status(200).json({
+      ok: true,
+      user: user,
+    });
+  } catch (error) {
+    return res.status(503).json({
+      ok: false,
+      msg: "Something happened",
+    });
+  }
+};
+
+module.exports = { createTodo, deleteTodo };

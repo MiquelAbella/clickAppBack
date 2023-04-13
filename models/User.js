@@ -17,6 +17,11 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
+  todos: {
+    type: Array,
+    required: true,
+    default: [],
+  },
 });
 
 module.exports = model("User", UserSchema);
