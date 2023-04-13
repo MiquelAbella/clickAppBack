@@ -17,6 +17,12 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
+  todos: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Todo",
+    },
+  ],
 });
 
 module.exports = model("User", UserSchema);
